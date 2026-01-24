@@ -1,0 +1,29 @@
+/* frontend/client/src/index.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+/* ============= Base Styles ============= */
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  background-color: #fafafa;
+  font-family: "Inter", sans-serif;
+  color: #333;
+  line-height: 1.6;
+  font-size: clamp(1.3rem, 2.3vw, 1.5rem);
+}
+
+.content-wrapper {
+  padding: 10rem;
+}
