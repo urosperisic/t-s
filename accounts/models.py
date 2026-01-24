@@ -6,15 +6,15 @@ from django.db import models
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
-        ('admin', 'Admin'),
-        ('user', 'User'),
+        ("admin", "Admin"),
+        ("user", "User"),
     )
 
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="user")
 
     def __str__(self):
-        return f'{self.username} ({self.role})'
+        return f"{self.username} ({self.role})"
 
     class Meta:
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
+        verbose_name = "User"
+        verbose_name_plural = "Users"

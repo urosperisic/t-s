@@ -16,7 +16,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "tsapp.duckdns.org", "46.224.20.16"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     "rest_framework",
     # Internal
     "frontend",
-    'accounts',
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -125,4 +125,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 MEDIA_URL = "media/"
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = "accounts.CustomUser"
