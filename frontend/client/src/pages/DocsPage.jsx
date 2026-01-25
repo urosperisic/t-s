@@ -11,6 +11,7 @@ function DocsPage() {
   const [selectedSection, setSelectedSection] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [copiedId, setCopiedId] = useState(null);
 
   useEffect(() => {
     fetchBooks();
@@ -72,9 +73,25 @@ function DocsPage() {
     lineHeight: '1.6',
   };
 
+  const customTokenStyles = {
+  'keyword': { color: '#C678DD' },
+  'string': { color: '#98C379' },
+  'comment': { color: 'var(--c-text)', opacity: 0.7 },
+};
+
   const customCodeStyle = {
     color: 'var(--c-text)',
   };
+
+  const copyToClipboard = async (code, snippetId) => {
+  try {
+    await navigator.clipboard.writeText(code);
+    setCopiedId(snippetId);
+    setTimeout(() => setCopiedId(null), 2000);
+  } catch (err) {
+    console.error('Failed to copy:', err);
+  }
+};
 
   if (loading) {
     return (
@@ -176,15 +193,35 @@ function DocsPage() {
                     </div>
                   )}
 
-                  <SyntaxHighlighter
-                    language={snippet.language}
-                    style={{}}
-                    customStyle={customStyle}
-                    codeTagProps={{ style: customCodeStyle }}
-                    className="snippet-code"
-                  >
-                    {snippet.code}
-                  </SyntaxHighlighter>
+                  <div className="snippet-code-wrapper">
+                    <button
+                      onClick={() => copyToClipboard(snippet.code, snippet.id)}
+                      className="copy-button"
+                      aria-label="Copy code"
+                      type="button"
+                    >
+                      {copiedId === snippet.id ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                      )}
+                    </button>
+
+                    <SyntaxHighlighter
+                      language={snippet.language}
+                      style={customTokenStyles}
+                      customStyle={customStyle}
+                      codeTagProps={{ style: customCodeStyle }}
+                      className="snippet-code"
+                    >
+                      {snippet.code}
+                    </SyntaxHighlighter>
+                  </div>
                 </article>
               ))
             ) : (

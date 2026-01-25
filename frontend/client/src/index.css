@@ -8,7 +8,7 @@
   --c-back: #262624;
   --c-text: #faf9f5;
   --c-border: rgba(222, 220, 209, 0.15);
-  --c-accent: #4a4cce;
+  --c-accent: #C678DD;
 }
 
 /* ============= Base Styles ============= */
@@ -126,7 +126,7 @@ main {
 /* ============= Button (Single Style) ============= */
 .btn {
   background-color: var(--c-accent);
-  color: var(--c-text);
+  color: var(--c-back);
   border: 1px solid var(--c-accent);
   padding: 0.8rem 1.6rem;
   font-size: 1.3rem;
@@ -151,13 +151,40 @@ main {
 }
 
 .btn-danger {
-  background-color: #dc2626;
-  border-color: #dc2626;
+  background-color: var(--c-accent);
+  border-color: var(--c-accent);
 }
 
 .btn-small {
   padding: 0.6rem 1.2rem;
   font-size: 1.2rem;
+}
+
+/* ============= Copy Button ============= */
+.snippet-code-wrapper {
+  position: relative;
+}
+
+.copy-button {
+  position: absolute;
+  top: 0.1rem;
+  right: 0.1rem;
+  background-color: var(--c-back);
+  border: 1px solid var(--c-border);
+  color: var(--c-text);
+  padding: 0.6rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.snippet-code-wrapper:hover .copy-button {
+  opacity: 1;
+}
+
+.copy-button:hover {
+  cursor: pointer;
 }
 
 /* ============= Forms ============= */
@@ -225,7 +252,7 @@ main {
 }
 
 .form-error {
-  color: #dc2626;
+  color: var(--c-accent);
   font-size: 1.2rem;
   margin-top: 0.4rem;
 }
