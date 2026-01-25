@@ -1,9 +1,15 @@
-/* frontend/client/src/index.css */
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
-/* ============= Base Styles ============= */
+/* ============= CSS Variables ============= */
+:root {
+  --c-back-light: #2b2b29;
+  --c-back: #262624;
+  --c-text: #FAF9F5;
+  --c-border: rgba(222, 220, 209, 0.15);
+  --c-accent: #6366f1; /* accent */
+}
 
+/* ============= Base Styles ============= */
 *,
 *::after,
 *::before {
@@ -14,16 +20,40 @@
 
 html {
   font-size: 62.5%;
+  scroll-behavior: smooth;
 }
 
 body {
-  background-color: #fafafa;
+  background-color: var(--c-back);
   font-family: "Inter", sans-serif;
-  color: #333;
-  line-height: 1.6;
-  font-size: clamp(1.3rem, 2.3vw, 1.5rem);
+  color: var(--c-text);
+  line-height: 1.7;
+  font-size: clamp(1.4rem, 2vw, 1.6rem);
+  min-height: 100vh;
 }
 
 .content-wrapper {
-  padding: 10rem;
+  background-color: var(--c-back-light);
+  border: 0.1rem solid var(--c-border);
+  border-radius: 1.2rem;
+  margin: clamp(2rem, 5vw, 10rem);
+  padding: clamp(2rem, 4vw, 5rem);
+  max-width: 120rem;
+  margin-inline: auto;
+}
+
+/* Focus states */
+*:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 3px;
+  border-radius: 0.4rem;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .content-wrapper {
+    margin: 1.5rem;
+    padding: 2rem;
+    border-radius: 0.8rem;
+  }
 }
