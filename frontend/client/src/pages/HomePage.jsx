@@ -9,14 +9,13 @@ function HomePage() {
     <div className="welcome">
       <h1 className="welcome-title">
         Welcome, {user?.username}
-        {isAdmin && ' (Admin)'}
+        {isAdmin && ' - admin'}
       </h1>
       <p className="welcome-text">
         {isAdmin
           ? 'You have full access to manage content and users.'
           : 'Browse the documentation to learn more.'}
       </p>
-      <p>Djole, jesi li to ti 😅</p>
     </div>
   );
 }
