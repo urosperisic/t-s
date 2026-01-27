@@ -2,6 +2,7 @@
 
 const API_BASE_URL = '/api';
 
+// Flag
 let isRefreshing = false;
 
 /**

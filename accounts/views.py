@@ -112,11 +112,12 @@ def login_view(request):
     access_token = str(refresh.access_token)
     refresh_token = str(refresh)
 
-    # Create response
+    # Create response with token expiry info
     response = Response(
         {
             "detail": "Login successful",
             "user": UserSerializer(user).data,
+            "access_token_expires_in": settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
         },
         status=status.HTTP_200_OK,
     )
@@ -177,9 +178,13 @@ def refresh_view(request):
         refresh = RefreshToken(refresh_token)
         access_token = str(refresh.access_token)
 
-        # Create response
+        # Create response with token expiry info
         response = Response(
-            {"detail": "Token refreshed successfully"}, status=status.HTTP_200_OK
+            {
+                "detail": "Token refreshed successfully",
+                "access_token_expires_in": settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
+            },
+            status=status.HTTP_200_OK,
         )
 
         # Set new access token cookie
