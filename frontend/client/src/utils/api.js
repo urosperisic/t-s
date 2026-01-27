@@ -2,7 +2,6 @@
 
 const API_BASE_URL = '/api';
 
-// Flag da spreči infinite loop
 let isRefreshing = false;
 
 /**
@@ -28,21 +27,33 @@ async function fetchAPI(endpoint, options = {}) {
       return { success: true };
     }
 
-    // If 401 and not already refreshing and not the refresh endpoint itself
-    if (response.status === 401 && !isRefreshing && endpoint !== '/auth/refresh/' && endpoint !== '/auth/login/') {
+    // If 401 and not already refreshing and not auth-related endpoints
+    if (
+      response.status === 401 && 
+      !isRefreshing && 
+      endpoint !== '/auth/refresh/' && 
+      endpoint !== '/auth/login/' && 
+      endpoint !== '/auth/user/'
+    ) {
       isRefreshing = true;
       
       try {
         // Try to refresh the token
-        await fetch(`${API_BASE_URL}/auth/refresh/`, {
+        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh/`, {
           method: 'POST',
           credentials: 'include',
         });
         
         isRefreshing = false;
         
-        // Retry the original request
-        return fetchAPI(endpoint, options);
+        // Only retry if refresh actually succeeded
+        if (refreshResponse.ok) {
+          return fetchAPI(endpoint, options);
+        } else {
+          // Refresh failed - redirect to login
+          window.location.href = '/login';
+          throw new Error('Session expired. Please login again.');
+        }
       } catch (refreshError) {
         isRefreshing = false;
         // If refresh fails, redirect to login
