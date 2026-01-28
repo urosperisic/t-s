@@ -15,7 +15,7 @@ class OnlineUsersConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
 
-        # Pošalji trenutne online korisnike
+        # Send current online users
         if self.scope["user"].is_authenticated:
             await self.update_user_status(self.scope["user"].id, True)
             await self.broadcast_online_users()
@@ -34,7 +34,7 @@ class OnlineUsersConsumer(AsyncWebsocketConsumer):
         pass
 
     async def user_status_update(self, event):
-        # Fetchuj listu iz cache-a umesto da koristiš event['users']
+        # Fetch list
         online_users = await self.get_online_users()
 
         # Send message to WebSocket

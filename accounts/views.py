@@ -28,7 +28,7 @@ def broadcast_online_users():
         "online_users",
         {
             "type": "user_status_update",
-            "users": [],  # Consumer će sam fetchovati listu iz cache-a
+            "users": [],
         },
     )
 

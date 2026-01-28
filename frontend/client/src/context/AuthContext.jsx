@@ -48,12 +48,9 @@ export function AuthProvider({ children }) {
 
     // If token expires in less than 2 minutes, refresh immediately
     if (safeRefreshTime <= 30000) {
-      console.log('Token expires soon, refreshing immediately...');
       refreshToken();
       return;
     }
-
-    console.log(`Token refresh scheduled in ${Math.floor(safeRefreshTime / 1000)}s`);
 
     refreshTimeoutRef.current = setTimeout(() => {
       if (!refreshInProgress.current) {
@@ -65,7 +62,6 @@ export function AuthProvider({ children }) {
   const refreshToken = useCallback(async () => {
     // Prevent multiple simultaneous refresh attempts
     if (refreshInProgress.current) {
-      console.log('Refresh already in progress, skipping...');
       return false;
     }
 
@@ -79,7 +75,6 @@ export function AuthProvider({ children }) {
         scheduleTokenRefresh(response.access_token_expires_in);
       }
 
-      console.log('Token refreshed successfully');
       return true;
       
     } catch (error) {
@@ -107,12 +102,10 @@ export function AuthProvider({ children }) {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}/ws/online-users/`;
     
-    console.log('Connecting to WebSocket...');
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
     ws.onopen = () => {
-      console.log('WebSocket connected');
       // Clear any reconnect timeout
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
@@ -132,12 +125,10 @@ export function AuthProvider({ children }) {
     };
 
     ws.onclose = () => {
-      console.log('WebSocket disconnected');
       wsRef.current = null;
       
       // Attempt to reconnect after 3 seconds if user is still logged in
       if (user) {
-        console.log('Attempting to reconnect in 3 seconds...');
         reconnectTimeoutRef.current = setTimeout(() => {
           connectWebSocket();
         }, 3000);
@@ -200,7 +191,6 @@ export function AuthProvider({ children }) {
       
       // If token expired or expires soon (within 1 minute), refresh immediately
       if (tokenExpiryRef.current - now < 60000) {
-        console.log('Token expired or expiring soon while tab was inactive, refreshing...');
         refreshToken();
       }
     }

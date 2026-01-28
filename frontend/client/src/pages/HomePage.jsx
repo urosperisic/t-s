@@ -9,17 +9,14 @@ function HomePage() {
   const prevUsersRef = useRef([]);
 
   useEffect(() => {
-    // Pronađi nove usere (koji su se upravo ulogovali)
     const prevUserIds = new Set(prevUsersRef.current.map(u => u.id));
     const newUsers = onlineUsers.filter(u => !prevUserIds.has(u.id));
 
     if (newUsers.length > 0) {
-      // Dodaj nove usere u animating set
       const newAnimatingSet = new Set(animatingUsers);
       newUsers.forEach(u => newAnimatingSet.add(u.id));
       setAnimatingUsers(newAnimatingSet);
 
-      // Ukloni iz animating seta posle 800ms (dužina animacije)
       const timeout = setTimeout(() => {
         setAnimatingUsers(new Set());
       }, 800);
