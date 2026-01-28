@@ -29,21 +29,27 @@ function HomePage() {
   }, [onlineUsers]);
 
   return (
-    <div className="welcome">
-      <h1 className="welcome-title">
-        Welcome, {user?.username}
-        {isAdmin && ' (Admin)'}
-      </h1>
-      <p className="welcome-text">
-        {isAdmin
-          ? 'You have full access to manage content and users.'
-          : 'Browse the documentation to learn more.'}
-      </p>
+    <div className="page-container">
+      <header className="page-header">
+        <h1 className="page-title">Home</h1>
+      </header>
+
+      <div className="welcome">
+        <p className="welcome-text" style={{ fontSize: '1.6rem', marginBottom: '0.8rem' }}>
+          Welcome, {user?.username}
+          {isAdmin && ' - admin'}
+        </p>
+        <p className="welcome-text">
+          {isAdmin
+            ? 'You have full access to manage content and users.'
+            : 'Browse the documentation to learn more.'}
+        </p>
+      </div>
       
       <div style={{ marginTop: '3rem' }}>
-        <h2 style={{ fontSize: '1.6rem', marginBottom: '1rem' }}>
-          Online Users ({onlineUsers.length})
-        </h2>
+        <p style={{ fontSize: '1.6rem', marginBottom: '1rem' }}>
+          Online users {onlineUsers.length}
+        </p>
         {onlineUsers.length === 0 ? (
           <div className="empty-state">No users online</div>
         ) : (
@@ -55,7 +61,7 @@ function HomePage() {
               >
                 <span className="user-email">
                   {onlineUser.username}
-                  {onlineUser.role === 'admin' && ' (Admin)'}
+                  {onlineUser.role === 'admin' && ' - admin'}
                 </span>
                 <span style={{ 
                   width: '8px', 
