@@ -25,11 +25,11 @@ def broadcast_online_users():
     """Broadcast online users list to all WebSocket connections"""
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        'online_users',
+        "online_users",
         {
-            'type': 'user_status_update',
-            'users': []  # Consumer će sam fetchovati listu iz cache-a
-        }
+            "type": "user_status_update",
+            "users": [],  # Consumer će sam fetchovati listu iz cache-a
+        },
     )
 
 
@@ -131,7 +131,9 @@ def login_view(request):
         {
             "detail": "Login successful",
             "user": UserSerializer(user).data,
-            "access_token_expires_in": settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
+            "access_token_expires_in": settings.SIMPLE_JWT[
+                "ACCESS_TOKEN_LIFETIME"
+            ].total_seconds(),
         },
         status=status.HTTP_200_OK,
     )
@@ -168,7 +170,8 @@ def logout_view(request):
 
     # Clear user from cache BEFORE creating response
     from django.core.cache import cache
-    cache.delete(f'user_online_{request.user.id}')
+
+    cache.delete(f"user_online_{request.user.id}")
 
     # Create response
     response = Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
@@ -206,7 +209,9 @@ def refresh_view(request):
         response = Response(
             {
                 "detail": "Token refreshed successfully",
-                "access_token_expires_in": settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
+                "access_token_expires_in": settings.SIMPLE_JWT[
+                    "ACCESS_TOKEN_LIFETIME"
+                ].total_seconds(),
             },
             status=status.HTTP_200_OK,
         )
@@ -283,11 +288,12 @@ def delete_user_view(request, user_id):
         )
 
     username = user.username
-    
+
     # Clear user from cache
     from django.core.cache import cache
-    cache.delete(f'user_online_{user.id}')
-    
+
+    cache.delete(f"user_online_{user.id}")
+
     user.delete()
 
     # Broadcast to WebSocket
