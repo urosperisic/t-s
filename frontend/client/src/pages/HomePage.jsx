@@ -9,17 +9,26 @@ function HomePage() {
   const prevUsersRef = useRef([]);
 
   useEffect(() => {
+    if (onlineUsers.length === 0) {
+      prevUsersRef.current = [];
+      setAnimatingUsers(new Set());
+      return;
+    }
+
     const prevUserIds = new Set(prevUsersRef.current.map(u => u.id));
     const newUsers = onlineUsers.filter(u => !prevUserIds.has(u.id));
 
     if (newUsers.length > 0) {
-      const newAnimatingSet = new Set(animatingUsers);
+      const newAnimatingSet = new Set();
       newUsers.forEach(u => newAnimatingSet.add(u.id));
       setAnimatingUsers(newAnimatingSet);
 
       const timeout = setTimeout(() => {
         setAnimatingUsers(new Set());
       }, 800);
+
+      // Update previous users
+      prevUsersRef.current = onlineUsers;
 
       return () => clearTimeout(timeout);
     }
