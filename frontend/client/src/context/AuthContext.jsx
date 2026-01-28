@@ -8,11 +8,14 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   
   // Prevent multiple simultaneous refresh attempts
   const refreshInProgress = useRef(false);
   const refreshTimeoutRef = useRef(null);
   const tokenExpiryRef = useRef(null);
+  const wsRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -84,12 +87,77 @@ export function AuthProvider({ children }) {
       
       // If refresh fails, log out
       setUser(null);
+      disconnectWebSocket();
       window.location.href = '/login';
       return false;
     } finally {
       refreshInProgress.current = false;
     }
   }, [scheduleTokenRefresh]);
+
+  // WebSocket connection logic
+  const connectWebSocket = useCallback(() => {
+    if (!user) return;
+
+    // Close existing connection if any
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/online-users/`;
+    
+    console.log('Connecting to WebSocket...');
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log('WebSocket connected');
+      // Clear any reconnect timeout
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'online_users') {
+        setOnlineUsers(data.users);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket disconnected');
+      wsRef.current = null;
+      
+      // Attempt to reconnect after 3 seconds if user is still logged in
+      if (user) {
+        console.log('Attempting to reconnect in 3 seconds...');
+        reconnectTimeoutRef.current = setTimeout(() => {
+          connectWebSocket();
+        }, 3000);
+      }
+    };
+  }, [user]);
+
+  const disconnectWebSocket = useCallback(() => {
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+    
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+    
+    setOnlineUsers([]);
+  }, []);
 
   const login = async (credentials) => {
     const response = await authAPI.login(credentials);
@@ -117,6 +185,9 @@ export function AuthProvider({ children }) {
     
     tokenExpiryRef.current = null;
     refreshInProgress.current = false;
+    
+    // Disconnect WebSocket
+    disconnectWebSocket();
     
     await authAPI.logout();
     setUser(null);
@@ -146,14 +217,31 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, [checkAuth]);
 
+  // Connect WebSocket when user logs in
+  useEffect(() => {
+    if (user) {
+      connectWebSocket();
+    } else {
+      disconnectWebSocket();
+    }
+
+    return () => {
+      disconnectWebSocket();
+    };
+  }, [user, connectWebSocket, disconnectWebSocket]);
+
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (refreshTimeoutRef.current) {
         clearTimeout(refreshTimeoutRef.current);
       }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      disconnectWebSocket();
     };
-  }, []);
+  }, [disconnectWebSocket]);
 
   const value = {
     user,
@@ -163,6 +251,7 @@ export function AuthProvider({ children }) {
     logout,
     refreshToken,
     isAdmin: user?.role === 'admin',
+    onlineUsers,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

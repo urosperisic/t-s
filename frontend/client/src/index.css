@@ -540,6 +540,48 @@ main {
   opacity: 0.6;
 }
 
+/* ============= Online User Animation ============= */
+.user-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.user-item.new-user::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--c-accent) 20%,
+    var(--c-accent) 80%,
+    transparent 100%
+  );
+  animation: swipe-line 1.4s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes swipe-line {
+  0% {
+    transform: translateY(-50%) translateX(-100%) scaleX(0.3);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-50%) translateX(0%) scaleX(1);
+  }
+  100% {
+    transform: translateY(-50%) translateX(100%) scaleX(0.3);
+    opacity: 0;
+  }
+}
+
 /* ============= Responsive ============= */
 @media (max-width: 768px) {
   .docs-container {

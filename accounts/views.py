@@ -8,6 +8,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 from .models import CustomUser
 from .permissions import IsAdmin
@@ -17,6 +19,18 @@ from .serializers import (
     UserListSerializer,
     UserSerializer,
 )
+
+
+def broadcast_online_users():
+    """Broadcast online users list to all WebSocket connections"""
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'online_users',
+        {
+            'type': 'user_status_update',
+            'users': []  # Consumer će sam fetchovati listu iz cache-a
+        }
+    )
 
 
 def set_auth_cookies(response, access_token, refresh_token):
@@ -125,6 +139,9 @@ def login_view(request):
     # Set cookies
     set_auth_cookies(response, access_token, refresh_token)
 
+    # Broadcast to WebSocket - DON'T do it here, WebSocket connect will handle it
+    # broadcast_online_users()
+
     return response
 
 
@@ -149,11 +166,18 @@ def logout_view(request):
         # Token is already invalid or blacklisted
         pass
 
+    # Clear user from cache BEFORE creating response
+    from django.core.cache import cache
+    cache.delete(f'user_online_{request.user.id}')
+
     # Create response
     response = Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
 
     # Delete cookies
     delete_auth_cookies(response)
+
+    # Broadcast to WebSocket that user list changed
+    broadcast_online_users()
 
     return response
 
@@ -259,7 +283,15 @@ def delete_user_view(request, user_id):
         )
 
     username = user.username
+    
+    # Clear user from cache
+    from django.core.cache import cache
+    cache.delete(f'user_online_{user.id}')
+    
     user.delete()
+
+    # Broadcast to WebSocket
+    broadcast_online_users()
 
     return Response(
         {"detail": f"User '{username}' deleted successfully"},

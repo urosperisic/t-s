@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,78 +14,187 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Book',
+            name="Book",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=255, unique=True)),
-                ('description', models.TextField(blank=True)),
-                ('is_published', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='books', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=255, unique=True)),
+                ("description", models.TextField(blank=True)),
+                ("is_published", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="books",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Book',
-                'verbose_name_plural': 'Books',
-                'ordering': ['title'],
+                "verbose_name": "Book",
+                "verbose_name_plural": "Books",
+                "ordering": ["title"],
             },
         ),
         migrations.CreateModel(
-            name='Chapter',
+            name="Chapter",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=255)),
-                ('order', models.FloatField(help_text='Order number (e.g., 1.0, 1.5, 2.0 for insertion flexibility)')),
-                ('is_published', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('book', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chapters', to='snippets.book')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                (
+                    "order",
+                    models.FloatField(
+                        help_text="Order number (e.g., 1.0, 1.5, 2.0 for insertion flexibility)"
+                    ),
+                ),
+                ("is_published", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "book",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="chapters",
+                        to="snippets.book",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Chapter',
-                'verbose_name_plural': 'Chapters',
-                'ordering': ['book', 'order'],
-                'unique_together': {('book', 'order')},
+                "verbose_name": "Chapter",
+                "verbose_name_plural": "Chapters",
+                "ordering": ["book", "order"],
+                "unique_together": {("book", "order")},
             },
         ),
         migrations.CreateModel(
-            name='Section',
+            name="Section",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=255)),
-                ('order', models.FloatField(help_text='Order number (e.g., 1.0, 1.5, 2.0 for insertion flexibility)')),
-                ('is_published', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('chapter', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sections', to='snippets.chapter')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                (
+                    "order",
+                    models.FloatField(
+                        help_text="Order number (e.g., 1.0, 1.5, 2.0 for insertion flexibility)"
+                    ),
+                ),
+                ("is_published", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "chapter",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sections",
+                        to="snippets.chapter",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Section',
-                'verbose_name_plural': 'Sections',
-                'ordering': ['chapter', 'order'],
-                'unique_together': {('chapter', 'order')},
+                "verbose_name": "Section",
+                "verbose_name_plural": "Sections",
+                "ordering": ["chapter", "order"],
+                "unique_together": {("chapter", "order")},
             },
         ),
         migrations.CreateModel(
-            name='Snippet',
+            name="Snippet",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=255)),
-                ('code', models.TextField(help_text='The code snippet')),
-                ('language', models.CharField(choices=[('python', 'Python'), ('javascript', 'JavaScript'), ('typescript', 'TypeScript'), ('rust', 'Rust'), ('go', 'Go'), ('java', 'Java'), ('cpp', 'C++'), ('html', 'HTML'), ('css', 'CSS'), ('sql', 'SQL'), ('bash', 'Bash'), ('other', 'Other')], default='python', max_length=20)),
-                ('explanation', models.TextField(blank=True, help_text='Explanation of what the code does')),
-                ('order', models.FloatField(help_text='Order number (e.g., 1.0, 1.5, 2.0 for insertion flexibility)')),
-                ('is_published', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='snippets', to=settings.AUTH_USER_MODEL)),
-                ('section', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='snippets', to='snippets.section')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("code", models.TextField(help_text="The code snippet")),
+                (
+                    "language",
+                    models.CharField(
+                        choices=[
+                            ("python", "Python"),
+                            ("javascript", "JavaScript"),
+                            ("typescript", "TypeScript"),
+                            ("rust", "Rust"),
+                            ("go", "Go"),
+                            ("java", "Java"),
+                            ("cpp", "C++"),
+                            ("html", "HTML"),
+                            ("css", "CSS"),
+                            ("sql", "SQL"),
+                            ("bash", "Bash"),
+                            ("other", "Other"),
+                        ],
+                        default="python",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "explanation",
+                    models.TextField(
+                        blank=True, help_text="Explanation of what the code does"
+                    ),
+                ),
+                (
+                    "order",
+                    models.FloatField(
+                        help_text="Order number (e.g., 1.0, 1.5, 2.0 for insertion flexibility)"
+                    ),
+                ),
+                ("is_published", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="snippets",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "section",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="snippets",
+                        to="snippets.section",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Snippet',
-                'verbose_name_plural': 'Snippets',
-                'ordering': ['section', 'order'],
-                'unique_together': {('section', 'order')},
+                "verbose_name": "Snippet",
+                "verbose_name_plural": "Snippets",
+                "ordering": ["section", "order"],
+                "unique_together": {("section", "order")},
             },
         ),
     ]
