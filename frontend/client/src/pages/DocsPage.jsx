@@ -23,7 +23,7 @@ function DocsPage() {
       const data = await snippetsAPI.getBooks();
       setBooks(data);
       if (data.length > 0) {
-        fetchBook(data[0].id);
+        await fetchBook(data[0].id);
       }
     } catch (err) {
       setError(err.message);
@@ -36,8 +36,12 @@ function DocsPage() {
     try {
       const data = await snippetsAPI.getBook(bookId);
       setSelectedBook(data);
+      setSelectedChapter(null);
+      setSelectedSection(null);
+      
+      // Auto-select first chapter if available
       if (data.chapters && data.chapters.length > 0) {
-        fetchChapter(data.chapters[0].id);
+        await fetchChapter(data.chapters[0].id);
       }
     } catch (err) {
       setError(err.message);
@@ -48,8 +52,11 @@ function DocsPage() {
     try {
       const data = await snippetsAPI.getChapter(chapterId);
       setSelectedChapter(data);
+      setSelectedSection(null);
+      
+      // Auto-select first section if available
       if (data.sections && data.sections.length > 0) {
-        fetchSection(data.sections[0].id);
+        await fetchSection(data.sections[0].id);
       }
     } catch (err) {
       setError(err.message);
@@ -135,7 +142,7 @@ function DocsPage() {
           <select
             id="book-select"
             value={selectedBook?.id || ''}
-            onChange={(e) => fetchBook(e.target.value)}
+            onChange={(e) => fetchBook(Number(e.target.value))}
             className="form-select"
           >
             {books.map((book) => (

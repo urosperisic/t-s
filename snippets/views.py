@@ -8,10 +8,13 @@ from accounts.permissions import IsAdmin
 from .models import Book, Chapter, Section, Snippet
 from .permissions import IsAdminOrReadOnly
 from .serializers import (
+    BookDetailSerializer,
     BookListSerializer,
     BookSerializer,
+    ChapterDetailSerializer,
     ChapterListSerializer,
     ChapterSerializer,
+    SectionDetailSerializer,
     SectionListSerializer,
     SectionSerializer,
     SnippetSerializer,
@@ -32,18 +35,17 @@ class BookListView(generics.ListAPIView):
 
 
 class BookDetailView(generics.RetrieveAPIView):
-    """Get single book with chapters (users see only published)"""
+    """Get single book with chapter IDs (lazy loading)"""
 
-    serializer_class = BookSerializer
+    serializer_class = BookDetailSerializer
     permission_classes = [IsAdminOrReadOnly]
     lookup_field = "id"
 
     def get_queryset(self):
+        # Only prefetch chapters, not all nested data
         if self.request.user.role == "admin":
-            return Book.objects.prefetch_related("chapters__sections__snippets")
-        return Book.objects.filter(is_published=True).prefetch_related(
-            "chapters__sections__snippets"
-        )
+            return Book.objects.prefetch_related("chapters")
+        return Book.objects.filter(is_published=True).prefetch_related("chapters")
 
 
 class BookCreateView(generics.CreateAPIView):
@@ -91,18 +93,17 @@ class ChapterListView(generics.ListAPIView):
 
 
 class ChapterDetailView(generics.RetrieveAPIView):
-    """Get single chapter with sections"""
+    """Get single chapter with section IDs (lazy loading)"""
 
-    serializer_class = ChapterSerializer
+    serializer_class = ChapterDetailSerializer
     permission_classes = [IsAdminOrReadOnly]
     lookup_field = "id"
 
     def get_queryset(self):
+        # Only prefetch sections, not snippets
         if self.request.user.role == "admin":
-            return Chapter.objects.prefetch_related("sections__snippets")
-        return Chapter.objects.filter(is_published=True).prefetch_related(
-            "sections__snippets"
-        )
+            return Chapter.objects.prefetch_related("sections")
+        return Chapter.objects.filter(is_published=True).prefetch_related("sections")
 
 
 class ChapterCreateView(generics.CreateAPIView):
@@ -147,13 +148,14 @@ class SectionListView(generics.ListAPIView):
 
 
 class SectionDetailView(generics.RetrieveAPIView):
-    """Get single section with snippets"""
+    """Get single section with full snippets (loaded on demand)"""
 
-    serializer_class = SectionSerializer
+    serializer_class = SectionDetailSerializer
     permission_classes = [IsAdminOrReadOnly]
     lookup_field = "id"
 
     def get_queryset(self):
+        # NOW we load snippets, only when section is actually viewed
         if self.request.user.role == "admin":
             return Section.objects.prefetch_related("snippets")
         return Section.objects.filter(is_published=True).prefetch_related("snippets")
